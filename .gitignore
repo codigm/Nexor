@@ -1,0 +1,32 @@
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Go
+bin/
+pkg/
+argus-core
+hermes-core
+athena-core
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+
+# Node
+node_modules/
+npm-debug.log
+
+# Docker
+.docker/
+docker-compose.override.yml

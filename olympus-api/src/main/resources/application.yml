@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: olympus-api
+  cloud:
+    gateway:
+      routes:
+        - id: alpha-bank
+          uri: http://alpha-bank:8080
+          predicates:
+            - Path=/alpha/**
+          filters:
+            - RewritePath=/alpha/(?<segment>.*), /$\{segment}
+        - id: beta-bank
+          uri: http://beta-bank:8080
+          predicates:
+            - Path=/beta/**
+          filters:
+            - RewritePath=/beta/(?<segment>.*), /$\{segment}
+        - id: gamma-bank
+          uri: http://gamma-bank:8080
+          predicates:
+            - Path=/gamma/**
+          filters:
+            - RewritePath=/gamma/(?<segment>.*), /$\{segment}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
