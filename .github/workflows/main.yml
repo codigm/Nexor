@@ -1,0 +1,32 @@
+name: OLYMPUS CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test-and-build:
+    name: Test and Build Microservices
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+          
+      - name: Run Go Unit Tests (Hermes)
+        working-directory: ./hermes
+        run: |
+          go env -w GOSUMDB=off
+          go test ./... -v
+
+      # Because OLYMPUS uses Go, Java, and Node, the most comprehensive 
+      # build test is simply building all the Docker containers.
+      - name: Build Docker Compose Stack
+        run: docker compose build
