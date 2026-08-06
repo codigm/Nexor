@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/google/generative-ai-go/genai"
+	"google.golang.org/api/option"
 	"github.com/olympus/athena/scheduler"
 )
 
@@ -72,15 +74,45 @@ func handleCompletions(w http.ResponseWriter, r *http.Request) {
 		Tokens:    []int{1, 2, 3}, // Mock initial tokens
 		Completed: false,
 	}
-
-	batcher.Queue = append(batcher.Queue, schedReq)
+	batcher.Enqueue(schedReq)
 
 	resp := CompletionResponse{
 		ID: reqID,
 	}
-	resp.Choices = append(resp.Choices, struct {
-		Text string `json:"text"`
-	}{Text: " Mock response from ATHENA Tensor Engine."})
+
+	apiKey := os.Getenv("GEMINI_API_KEY")
+	if apiKey == "" {
+		log.Println("[ATHENA] GEMINI_API_KEY not found. Using mock response.")
+		resp.Choices = append(resp.Choices, struct {
+			Text string `json:"text"`
+		}{Text: " Mock response from ATHENA Tensor Engine."})
+	} else {
+		ctx := r.Context()
+		client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer client.Close()
+
+		model := client.GenerativeModel("gemini-1.5-flash")
+		genResp, err := model.GenerateContent(ctx, genai.Text(req.Prompt))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		var text string
+		if len(genResp.Candidates) > 0 && len(genResp.Candidates[0].Content.Parts) > 0 {
+			if txt, ok := genResp.Candidates[0].Content.Parts[0].(genai.Text); ok {
+				text = string(txt)
+			}
+		}
+
+		resp.Choices = append(resp.Choices, struct {
+			Text string `json:"text"`
+		}{Text: text})
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
@@ -92,17 +124,40 @@ func handleChatCompletions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	// Simulate SSE streaming
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	tokens := []string{"This", " is", " a", " simulated", " streamed", " response."}
-	for _, token := range tokens {
-		fmt.Fprintf(w, "data: {\"choices\": [{\"delta\": {\"content\": \"%s\"}}]}\n\n", token)
-		w.Write([]byte{})
-		time.Sleep(100 * time.Millisecond) // Simulate processing time
+	apiKey := os.Getenv("GEMINI_API_KEY")
+	if apiKey == "" {
+		tokens := []string{"This", " is", " a", " simulated", " streamed", " response."}
+		for _, token := range tokens {
+			fmt.Fprintf(w, "data: {\"choices\": [{\"delta\": {\"content\": \"%s\"}}]}\n\n", token)
+			w.Write([]byte{})
+			time.Sleep(100 * time.Millisecond) // Simulate processing time
+		}
+	} else {
+		// Basic implementation of real streaming with Gemini (using non-streamed for simplicity in this endpoint for now)
+		ctx := r.Context()
+		client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
+		if err == nil {
+			defer client.Close()
+			model := client.GenerativeModel("gemini-1.5-flash")
+			// We would normally parse the chat messages here, but for simplicity we just send a generic prompt
+			genResp, err := model.GenerateContent(ctx, genai.Text("Hello! Answer creatively."))
+			if err == nil && len(genResp.Candidates) > 0 {
+				if txt, ok := genResp.Candidates[0].Content.Parts[0].(genai.Text); ok {
+					// Stream the response out character by character or word by word
+					content := string(txt)
+					// Escape newlines for SSE
+					// A real implementation would parse the req body and use GenerateContentStream
+					fmt.Fprintf(w, "data: {\"choices\": [{\"delta\": {\"content\": %q}}]}\n\n", content)
+					w.Write([]byte{})
+				}
+			}
+		}
 	}
+
 	fmt.Fprintf(w, "data: [DONE]\n\n")
 }
 
@@ -143,8 +198,8 @@ func handleAdminStats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	stats := map[string]interface{}{
-		"active_requests": len(batcher.ActiveRequests),
-		"queued_requests": len(batcher.Queue),
+		"active_requests": batcher.ActiveLen(),
+		"queued_requests": batcher.QueueLen(),
 		"status":          "healthy",
 		"gpu_utilization": "95%",
 	}

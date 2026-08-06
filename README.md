@@ -17,7 +17,7 @@
 
 ## 📖 Overview
 
-**OLYMPUS** is a complex, microservices-based distributed system built to simulate a high-throughput central banking settlement network (similar to RTGS and NEFT). It orchestrates transactions between disparate bank systems, handles distributed ledgers, performs real-time fraud detection using graph processing, and leverages AI/LLMs for explainable analytics.
+**OLYMPUS** is a complex, microservices-based distributed system built to simulate a high-throughput central banking settlement network (similar to RTGS and NEFT). It orchestrates transactions between disparate bank systems, handles distributed ledgers, performs real-time fraud detection using graph processing, and leverages analytics.
 
 This project was built to demonstrate architectural patterns such as **Event-Driven Architecture**, **Distributed Saga Pattern**, **Polyglot Microservices**, and **AI Integration** in a highly concurrent environment.
 
@@ -25,7 +25,6 @@ This project was built to demonstrate architectural patterns such as **Event-Dri
 
 - 🏦 **Distributed Settlements**: Manages cross-bank financial routing utilizing the Saga pattern to ensure data consistency across multiple independent mock banking endpoints.
 - 🕵️ **Real-time Fraud Detection**: A graph-based engine that monitors Kafka event streams in real-time to score transactions for fraud, utilizing behavioral fingerprinting.
-- 🤖 **Explainable AI (XAI)**: Integrated LLM Inference Engine to generate human-readable explanations for why specific transactions were flagged as anomalous.
 - 📊 **Streaming Analytics**: Real-time aggregation of transaction data, monitoring throughput and system health.
 - 📈 **Full Observability**: Instrumentated with Prometheus and Grafana for real-time dashboards and alerting.
 
@@ -61,7 +60,7 @@ The system utilizes a polyglot monorepo approach, choosing the best tool for eac
 |---------|------------|-------------|
 | **Hermes Core** | `Go` | The Settlement & Routing engine handling distributed transactions (Sagas) and ISO20022 message parsing. |
 | **Argus Core** | `Go` | The Audit & Fraud engine listening to Kafka streams, performing graph analysis and fraud scoring. |
-| **Athena Core** | `Go` | An LLM Inference engine providing AI-based explanations and unstructured data processing via a continuous batching scheduler. |
+| **Athena Core** | `Go` | A high-performance mock inference engine simulating continuous batching. |
 | **Titan Core** | `Node.js` | Real-time analytics and reporting engine consuming transaction events. |
 | **Olympus API** | `Java (Spring Boot)` | The main API Gateway serving as the entry point for financial transactions. |
 | **The Banks** | `Java (Spring Boot)` | Mock financial institutions (`alpha-bank`, `beta-bank`, etc.) participating in the settlement network. |

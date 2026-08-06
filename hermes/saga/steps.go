@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
@@ -43,12 +44,39 @@ func CompensateReserveFunds(ctx context.Context, rdb *redis.Client, sCtx SAGACon
 
 // FRAUD_CHECK
 // Athena independently consumes from "payment-initiated" and publishes fraud
-// scores to "fraud-scored". For synchronous saga gating, Hermes can do a
-// short-poll against a Redis key that Athena sets: "fraud:<txId>=SAFE|REVIEW|BLOCK".
-// Until that loop is wired, we allow transactions to proceed (fail-open).
-func FraudCheck(ctx context.Context, sCtx SAGAContext) error {
-	log.Printf("[FRAUD_CHECK] Checking Redis for Athena score on tx %s", sCtx.TransactionID)
-	return nil
+// scores to "fraud-scored". For synchronous saga gating, Hermes short-polls 
+// against a Redis key that Argus sets: "fraud:<txId>=SAFE|REVIEW|BLOCK".
+func FraudCheck(ctx context.Context, rdb *redis.Client, sCtx SAGAContext) error {
+	log.Printf("[FRAUD_CHECK] Polling Redis for Argus score on tx %s", sCtx.TransactionID)
+	
+	timeout := time.After(5 * time.Second)
+	ticker := time.NewTicker(200 * time.Millisecond)
+	defer ticker.Stop()
+	
+	key := "fraud:" + sCtx.TransactionID
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-timeout:
+			log.Printf("[FRAUD_CHECK] Timeout waiting for Argus score on tx %s. Failing open.", sCtx.TransactionID)
+			return nil
+		case <-ticker.C:
+			val, err := rdb.Get(ctx, key).Result()
+			if err == redis.Nil {
+				continue
+			} else if err != nil {
+				return err
+			}
+			
+			log.Printf("[FRAUD_CHECK] Received score %s for tx %s", val, sCtx.TransactionID)
+			if val == "BLOCK" || val == "REVIEW" {
+				return fmt.Errorf("transaction flagged for fraud: %s", val)
+			}
+			return nil
+		}
+	}
 }
 
 // DEBIT_SENDER

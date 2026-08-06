@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -12,8 +13,27 @@ type Request struct {
 }
 
 type ContinuousBatcher struct {
+	mu             sync.Mutex
 	ActiveRequests []*Request
 	Queue          []*Request
+}
+
+func (cb *ContinuousBatcher) Enqueue(req *Request) {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	cb.Queue = append(cb.Queue, req)
+}
+
+func (cb *ContinuousBatcher) QueueLen() int {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	return len(cb.Queue)
+}
+
+func (cb *ContinuousBatcher) ActiveLen() int {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	return len(cb.ActiveRequests)
 }
 
 func (cb *ContinuousBatcher) Run() {
@@ -22,7 +42,7 @@ func (cb *ContinuousBatcher) Run() {
 		cb.removeCompleted()
 		cb.fillFreeSlotsFromQueue()
 		
-		if len(cb.ActiveRequests) == 0 && len(cb.Queue) == 0 {
+		if cb.ActiveLen() == 0 && cb.QueueLen() == 0 {
 			time.Sleep(10 * time.Millisecond)
 			continue
 		}
@@ -33,6 +53,8 @@ func (cb *ContinuousBatcher) Run() {
 }
 
 func (cb *ContinuousBatcher) removeCompleted() {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
 	active := make([]*Request, 0)
 	for _, req := range cb.ActiveRequests {
 		if !req.Completed {
@@ -43,6 +65,8 @@ func (cb *ContinuousBatcher) removeCompleted() {
 }
 
 func (cb *ContinuousBatcher) fillFreeSlotsFromQueue() {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
 	maxBatchSize := 32
 	for len(cb.ActiveRequests) < maxBatchSize && len(cb.Queue) > 0 {
 		req := cb.Queue[0]
@@ -52,6 +76,8 @@ func (cb *ContinuousBatcher) fillFreeSlotsFromQueue() {
 }
 
 func (cb *ContinuousBatcher) executeOneBatch() {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
 	fmt.Printf("Executing 1 forward pass for %d requests\n", len(cb.ActiveRequests))
 	// Simulating forward pass
 	for _, req := range cb.ActiveRequests {

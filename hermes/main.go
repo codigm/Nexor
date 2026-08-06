@@ -6,16 +6,26 @@ import (
 	"log"
 	"os"
 	"strings"
+	"net/http"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"github.com/olympus/hermes/saga"
+	"github.com/olympus/hermes/tracing"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http"
 )
 
 func main() {
 	log.Println("Initializing HERMES core...")
+
+	// Initialize OpenTelemetry Tracing
+	jaegerEndpoint := getEnv("JAEGER_ENDPOINT", "localhost:4318")
+	tp := tracing.InitTracer("hermes-core", jaegerEndpoint)
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down tracer provider: %v", err)
+		}
+	}()
 
 	// Postgres Connection
 	dbUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",

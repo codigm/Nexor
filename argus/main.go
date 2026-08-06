@@ -17,8 +17,11 @@ import (
 	"github.com/olympus/argus/fingerprint"
 	"github.com/olympus/argus/graph"
 	"github.com/olympus/argus/scoring"
+	"github.com/olympus/argus/tracing"
 	"github.com/olympus/titan/query"
 	_ "github.com/lib/pq"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // MockUserHistory implements scoring.UserHistory for demonstration
@@ -44,6 +47,15 @@ func main() {
 	log.Println("===========================================")
 	log.Println("   ARGUS — Audit & Fraud Engine v2.0       ")
 	log.Println("===========================================")
+
+	// Initialize OpenTelemetry Tracing
+	jaegerEndpoint := getEnv("JAEGER_ENDPOINT", "localhost:4318")
+	tp := tracing.InitTracer("argus-core", jaegerEndpoint)
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down tracer provider: %v", err)
+		}
+	}()
 
 	// 1. Initialize Postgres
 	dbHost := getEnv("DB_HOST", "localhost")
@@ -103,6 +115,8 @@ func main() {
 
 	log.Println("[ARGUS] Listening for transactions on Kafka topic 'transactions'...")
 
+	tracer := otel.Tracer("argus-core")
+
 	// 5. Processing Loop
 	for {
 		m, err := reader.ReadMessage(ctx)
@@ -123,22 +137,35 @@ func main() {
 			continue
 		}
 
+		spanCtx, span := tracer.Start(ctx, "AuditTransaction")
+		span.SetAttributes(attribute.String("transaction.id", txn.ID))
+
 		// Score Fraud
-		score, err := fraudScorer.ScoreTransaction(ctx, txn)
+		score, err := fraudScorer.ScoreTransaction(spanCtx, txn)
 		if err != nil {
 			log.Printf("[ARGUS] Failed to score transaction %s: %v\n", txn.ID, err)
+			span.End()
 			continue
 		}
 
+		// Store decision in Redis
+		err = rdb.Set(spanCtx, "fraud:"+txn.ID, score.Decision, 5*time.Minute).Err()
+		if err != nil {
+			log.Printf("[ARGUS] Failed to store fraud decision in Redis for %s: %v\n", txn.ID, err)
+		}
+
 		// Generate Explanation
-		explanation, err := explainerEngine.GenerateExplanation(ctx, txn, score)
+		explanation, err := explainerEngine.GenerateExplanation(spanCtx, txn, score)
 		if err != nil {
 			log.Printf("[ARGUS] Failed to generate explanation for %s: %v\n", txn.ID, err)
+			span.End()
 			continue
 		}
 
 		log.Printf("[ARGUS] RESULT for %s -> Decision: %s, Score: %d\n", txn.ID, score.Decision, score.TotalScore)
 		log.Printf("[ARGUS] EXPLANATION: \n%s\n", explanation)
+		
+		span.End()
 	}
 }
 

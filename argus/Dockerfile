@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:alpine AS builder
 
 WORKDIR /app
 
@@ -11,6 +11,7 @@ COPY . .
 
 # Change to the argus directory to build
 WORKDIR /app/argus
+RUN go env -w GOSUMDB=off
 RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -o argus-core .
 

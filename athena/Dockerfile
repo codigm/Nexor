@@ -2,7 +2,7 @@
 # ATHENA — Fraud Detection Engine
 # Multi-stage Go build for a minimal production image
 # ============================================================
-FROM golang:1.21-alpine AS builder
+FROM golang:alpine AS builder
 
 WORKDIR /app
 
@@ -10,6 +10,7 @@ WORKDIR /app
 RUN apk add --no-cache git
 
 COPY . .
+RUN go env -w GOSUMDB=off
 RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o athena ./main.go
 

@@ -2,14 +2,14 @@
 # HERMES — Saga Orchestrator (Go)
 # Multi-stage build for minimal production image
 # ============================================================
-FROM golang:1.21-alpine AS builder
+FROM golang:alpine AS builder
 
 WORKDIR /app
 
 RUN apk add --no-cache git
 
 COPY . .
-RUN go get github.com/prometheus/client_golang@v1.18.0
+RUN go env -w GOSUMDB=off
 RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o hermes ./main.go
 

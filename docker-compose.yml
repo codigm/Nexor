@@ -33,7 +33,7 @@ services:
     image: redis:7-alpine
     container_name: olympus-redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
@@ -126,6 +126,16 @@ services:
       retries: 5
     logging: *default-logging
 
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: olympus-jaeger
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    logging: *default-logging
+
   # ==========================================
   # BANKS
   # ==========================================
@@ -212,6 +222,7 @@ services:
       - DB_NAME=olympus_db
       - REDIS_ADDR=redis:6379
       - KAFKA_BROKERS=kafka:9092
+      - JAEGER_ENDPOINT=jaeger:4318
     depends_on:
       postgres:
         condition: service_healthy
@@ -266,6 +277,7 @@ services:
       - DB_NAME=olympus_db
       - REDIS_ADDR=redis:6379
       - KAFKA_BROKERS=kafka:9092
+      - JAEGER_ENDPOINT=jaeger:4318
     depends_on:
       postgres:
         condition: service_healthy

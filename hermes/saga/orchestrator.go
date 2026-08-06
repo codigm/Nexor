@@ -14,6 +14,8 @@ import (
 	"github.com/olympus/hermes/iso20022"
 	"github.com/olympus/hermes/settlement"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
@@ -25,6 +27,7 @@ var (
 		},
 		[]string{"type", "status"},
 	)
+	tracer = otel.Tracer("hermes-core")
 )
 
 type Orchestrator struct {
@@ -132,6 +135,10 @@ func getBankID(account string) string {
 }
 
 func (o *Orchestrator) executeSaga(ctx context.Context, sCtx SAGAContext, rawAmount float64) {
+	ctx, span := tracer.Start(ctx, "executeSaga")
+	span.SetAttributes(attribute.String("transaction.id", sCtx.TransactionID))
+	defer span.End()
+
 	o.updateState(ctx, sCtx.TransactionID, "STARTED")
 	log.Printf("--- STARTING SAGA FOR %s ---", sCtx.TransactionID)
 
@@ -161,7 +168,7 @@ func (o *Orchestrator) executeSaga(ctx context.Context, sCtx SAGAContext, rawAmo
 	}
 
 	o.updateState(ctx, sCtx.TransactionID, "FRAUD_CHECK")
-	if err := FraudCheck(ctx, sCtx); err != nil {
+	if err := FraudCheck(ctx, o.rdb, sCtx); err != nil {
 		CompensateReserveFunds(ctx, o.rdb, sCtx)
 		o.failSaga(ctx, sCtx, err, rawAmount)
 		return
