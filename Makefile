@@ -9,8 +9,8 @@ all: build up
 # Bring up Phase 1 & 2 services in detached mode
 up:
 	@echo "Starting OLYMPUS infrastructure..."
-	$(DC) up -d postgres redis zookeeper kafka prometheus grafana alpha-bank beta-bank gamma-bank hermes-core olympus-api athena-core titan-core argus-core
-	@echo "Phase 1 & 2 services started."
+	$(DC) up -d postgres redis zookeeper kafka prometheus grafana alpha-bank beta-bank gamma-bank hermes-core olympus-api athena-core titan-core argus-core dashboard
+	@echo "Phase 1 & 2 services and dashboard started."
 
 # Bring down all services
 down:
@@ -21,7 +21,7 @@ down:
 # Build Phase 1 & 2 services
 build:
 	@echo "Building OLYMPUS services..."
-	$(DC) build alpha-bank beta-bank gamma-bank hermes-core olympus-api athena-core titan-core argus-core
+	$(DC) build alpha-bank beta-bank gamma-bank hermes-core olympus-api athena-core titan-core argus-core dashboard
 
 # Run all tests across the monorepo
 test:
@@ -58,7 +58,7 @@ demo:
 
 # Tail Phase 1 & 2 logs
 logs:
-	$(DC) logs -f hermes-core alpha-bank beta-bank gamma-bank olympus-api athena-core titan-core argus-core
+	$(DC) logs -f hermes-core alpha-bank beta-bank gamma-bank olympus-api athena-core titan-core argus-core dashboard
 
 # Clean up volumes and orphans
 clean:

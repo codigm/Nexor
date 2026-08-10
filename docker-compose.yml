@@ -44,6 +44,23 @@ services:
       retries: 5
     logging: *default-logging
 
+  neo4j:
+    image: neo4j:5-community
+    container_name: olympus-neo4j
+    environment:
+      NEO4J_AUTH: neo4j/olympus_neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    logging: *default-logging
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: olympus-zookeeper
@@ -254,6 +271,8 @@ services:
       context: ./titan
       dockerfile: Dockerfile
     container_name: titan-core
+    ports:
+      - "4000:4000"
     environment:
       - REDIS_ADDR=redis:6379
       - KAFKA_BROKERS=kafka:9092
@@ -278,6 +297,9 @@ services:
       - REDIS_ADDR=redis:6379
       - KAFKA_BROKERS=kafka:9092
       - JAEGER_ENDPOINT=jaeger:4318
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=olympus_neo4j
     depends_on:
       postgres:
         condition: service_healthy
@@ -285,11 +307,27 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    logging: *default-logging
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: olympus-dashboard
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - titan-core
     logging: *default-logging
 
 volumes:
   postgres_data:
   redis_data:
+  neo4j_data:
   zookeeper_data:
   zookeeper_log:
   kafka_data:

@@ -1,26 +1,24 @@
 # ============================================================
 # ATHENA — Fraud Detection Engine
 # Multi-stage Go build for a minimal production image
+# Multi-stage Rust build for a minimal production image
 # ============================================================
-FROM golang:alpine AS builder
+FROM rust:alpine AS builder
 
 WORKDIR /app
+# Install build dependencies for Rust on Alpine
+RUN apk add --no-cache musl-dev gcc
 
-# Install git for go module downloads
-RUN apk add --no-cache git
+COPY Cargo.toml ./
+COPY src ./src
 
-COPY . .
-RUN go env -w GOSUMDB=off
-RUN go mod tidy
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o athena ./main.go
+RUN cargo build --release
 
-# --- Final minimal image ---
+# Final minimal image
 FROM alpine:3.18
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-
-COPY --from=builder /app/athena .
+RUN apk add --no-cache ca-certificates
+WORKDIR /app
+COPY --from=builder /app/target/release/athena-core .
 
 EXPOSE 8085
-
-CMD ["./athena"]
+CMD ["./athena-core"]

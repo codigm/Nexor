@@ -12,6 +12,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"github.com/segmentio/kafka-go"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 
 	"github.com/olympus/argus/explain"
 	"github.com/olympus/argus/fingerprint"
@@ -78,8 +79,19 @@ func main() {
 	})
 	defer rdb.Close()
 
-	// 3. Initialize Engines
-	graphEngine := graph.NewPostgresRedisGraphEngine(db, rdb)
+	// 3. Initialize Neo4j
+	neo4jURI := getEnv("NEO4J_URI", "bolt://localhost:7687")
+	neo4jUser := getEnv("NEO4J_USER", "neo4j")
+	neo4jPass := getEnv("NEO4J_PASSWORD", "neo4j_password")
+	
+	neo4jDriver, err := neo4j.NewDriverWithContext(neo4jURI, neo4j.BasicAuth(neo4jUser, neo4jPass, ""))
+	if err != nil {
+		log.Fatalf("[ARGUS] Failed to create Neo4j driver: %v", err)
+	}
+	defer neo4jDriver.Close(context.Background())
+
+	// 4. Initialize Engines
+	graphEngine := graph.NewNeo4jEngine(neo4jDriver)
 	riskPropagator := &graph.RiskPropagator{} // Currently empty struct in graph package
 
 	// Initialize embedded TITAN executor as mock for behavioral fingerprinting
@@ -95,7 +107,7 @@ func main() {
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{kafkaBrokers},
 		GroupID: "argus-audit-group",
-		Topic:   "transactions",
+		Topic:   "payment-initiated",
 		MinBytes: 10e3, // 10KB
 		MaxBytes: 10e6, // 10MB
 	})
@@ -113,7 +125,7 @@ func main() {
 		cancel()
 	}()
 
-	log.Println("[ARGUS] Listening for transactions on Kafka topic 'transactions'...")
+	log.Println("[ARGUS] Listening for transactions on Kafka topic 'payment-initiated'...")
 
 	tracer := otel.Tracer("argus-core")
 
