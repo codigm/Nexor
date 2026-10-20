@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-init
-  namespace: olympus
+  namespace: nexor
 data:
   init.sql: |
     CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -52,37 +52,38 @@ data:
     FROM journal_entries;
     
     INSERT INTO accounts (bank, user_name, account_number, balance) VALUES
-    ('AlphaBank', 'Alpha User 1', 'ALPHA001', 100000.0000),
-    ('AlphaBank', 'Alpha User 2', 'ALPHA002', 100000.0000),
-    ('AlphaBank', 'Alpha User 3', 'ALPHA003', 100000.0000),
-    ('AlphaBank', 'Alpha User 4', 'ALPHA004', 100000.0000),
-    ('AlphaBank', 'Alpha User 5', 'ALPHA005', 100000.0000),
-    ('AlphaBank', 'Alpha User 6', 'ALPHA006', 100000.0000),
-    ('AlphaBank', 'Alpha User 7', 'ALPHA007', 100000.0000),
-    ('AlphaBank', 'Alpha User 8', 'ALPHA008', 100000.0000),
-    ('AlphaBank', 'Alpha User 9', 'ALPHA009', 100000.0000),
-    ('AlphaBank', 'Alpha User 10', 'ALPHA010', 100000.0000);
+    ('HeliosBank', 'Helios User 1', 'HELIOS001', 100000.0000),
+    ('HeliosBank', 'Helios User 2', 'HELIOS002', 100000.0000),
+    ('HeliosBank', 'Helios User 3', 'HELIOS003', 100000.0000),
+    ('HeliosBank', 'Helios User 4', 'HELIOS004', 100000.0000),
+    ('HeliosBank', 'Helios User 5', 'HELIOS005', 100000.0000),
+    ('HeliosBank', 'Helios User 6', 'HELIOS006', 100000.0000),
+    ('HeliosBank', 'Helios User 7', 'HELIOS007', 100000.0000),
+    ('HeliosBank', 'Helios User 8', 'HELIOS008', 100000.0000),
+    ('HeliosBank', 'Helios User 9', 'HELIOS009', 100000.0000),
+    ('HeliosBank', 'Helios User 10', 'HELIOS010', 100000.0000);
     
     INSERT INTO accounts (bank, user_name, account_number, balance) VALUES
-    ('BetaBank', 'Beta User 1', 'BETA001', 100000.0000),
-    ('BetaBank', 'Beta User 2', 'BETA002', 100000.0000),
-    ('BetaBank', 'Beta User 3', 'BETA003', 100000.0000),
-    ('BetaBank', 'Beta User 4', 'BETA004', 100000.0000),
-    ('BetaBank', 'Beta User 5', 'BETA005', 100000.0000),
-    ('BetaBank', 'Beta User 6', 'BETA006', 100000.0000),
-    ('BetaBank', 'Beta User 7', 'BETA007', 100000.0000),
-    ('BetaBank', 'Beta User 8', 'BETA008', 100000.0000),
-    ('BetaBank', 'Beta User 9', 'BETA009', 100000.0000),
-    ('BetaBank', 'Beta User 10', 'BETA010', 100000.0000);
+    ('OrionBank', 'Orion User 1', 'ORION001', 100000.0000),
+    ('OrionBank', 'Orion User 2', 'ORION002', 100000.0000),
+    ('OrionBank', 'Orion User 3', 'ORION003', 100000.0000),
+    ('OrionBank', 'Orion User 4', 'ORION004', 100000.0000),
+    ('OrionBank', 'Orion User 5', 'ORION005', 100000.0000),
+    ('OrionBank', 'Orion User 6', 'ORION006', 100000.0000),
+    ('OrionBank', 'Orion User 7', 'ORION007', 100000.0000),
+    ('OrionBank', 'Orion User 8', 'ORION008', 100000.0000),
+    ('OrionBank', 'Orion User 9', 'ORION009', 100000.0000),
+    ('OrionBank', 'Orion User 10', 'ORION010', 100000.0000);
     
     INSERT INTO accounts (bank, user_name, account_number, balance) VALUES
-    ('GammaBank', 'Gamma User 1', 'GAMMA001', 100000.0000),
-    ('GammaBank', 'Gamma User 2', 'GAMMA002', 100000.0000),
-    ('GammaBank', 'Gamma User 3', 'GAMMA003', 100000.0000),
-    ('GammaBank', 'Gamma User 4', 'GAMMA004', 100000.0000),
-    ('GammaBank', 'Gamma User 5', 'GAMMA005', 100000.0000),
-    ('GammaBank', 'Gamma User 6', 'GAMMA006', 100000.0000),
-    ('GammaBank', 'Gamma User 7', 'GAMMA007', 100000.0000),
-    ('GammaBank', 'Gamma User 8', 'GAMMA008', 100000.0000),
-    ('GammaBank', 'Gamma User 9', 'GAMMA009', 100000.0000),
-    ('GammaBank', 'Gamma User 10', 'GAMMA010', 100000.0000);
+    ('VesperBank', 'Vesper User 1', 'VESPER001', 100000.0000),
+    ('VesperBank', 'Vesper User 2', 'VESPER002', 100000.0000),
+    ('VesperBank', 'Vesper User 3', 'VESPER003', 100000.0000),
+    ('VesperBank', 'Vesper User 4', 'VESPER004', 100000.0000),
+    ('VesperBank', 'Vesper User 5', 'VESPER005', 100000.0000),
+    ('VesperBank', 'Vesper User 6', 'VESPER006', 100000.0000),
+    ('VesperBank', 'Vesper User 7', 'VESPER007', 100000.0000),
+    ('VesperBank', 'Vesper User 8', 'VESPER008', 100000.0000),
+    ('VesperBank', 'Vesper User 9', 'VESPER009', 100000.0000),
+    ('VesperBank', 'Vesper User 10', 'VESPER010', 100000.0000);
+

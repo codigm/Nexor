@@ -82,7 +82,7 @@ h1, h2, h3, h4, h5 { font-family: 'Outfit', sans-serif; }
   line-height: 1;
 }
 
-.title-olympus {
+.title-nexor {
   background: linear-gradient(135deg, #ffffff 0%, var(--accent-blue) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.olympus</groupId>
+        <groupId>com.nexor</groupId>
         <artifactId>banks-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>olympus-common</artifactId>
-    <name>olympus-common</name>
-    <description>Common DTOs and utilities for Olympus</description>
+    <artifactId>nexor-common</artifactId>
+    <name>nexor-common</name>
+    <description>Common DTOs and utilities for Nexor</description>
 
     <dependencies>
         <dependency>

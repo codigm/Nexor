@@ -1,6 +1,6 @@
 <div align="center">
   
-# 🏛️ OLYMPUS
+# 🏛️ NEXOR
 **A High-Performance Central Banking Settlement & Fraud Detection Engine**
 
 [![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://golang.org/)
@@ -17,7 +17,7 @@
 
 ## 📖 Overview
 
-**OLYMPUS** is a complex, microservices-based distributed system built to simulate a high-throughput central banking settlement network (similar to RTGS and NEFT). It orchestrates transactions between disparate bank systems, handles distributed ledgers, performs real-time fraud detection using graph processing, and leverages analytics.
+**NEXOR** is a complex, microservices-based distributed system built to simulate a high-throughput central banking settlement network (similar to RTGS and NEFT). It orchestrates transactions between disparate bank systems, handles distributed ledgers, performs real-time fraud detection using graph processing, and leverages analytics.
 
 This project was built to demonstrate architectural patterns such as **Event-Driven Architecture**, **Distributed Saga Pattern**, **Polyglot Microservices**, and **AI Integration** in a highly concurrent environment.
 
@@ -32,25 +32,25 @@ This project was built to demonstrate architectural patterns such as **Event-Dri
 
 ```mermaid
 flowchart TD
-    Client[Client / Demo Script] -->|HTTP POST| API[Olympus API Gateway\n(Java/Spring)]
+    Client[Client / Demo Script] -->|HTTP POST| API[Nexor API Gateway\n(Java/Spring)]
     
-    API -->|Route/Saga Init| Hermes[Hermes Core\nSettlement Engine (Go)]
+    API -->|Route/Saga Init| Perihelion[Perihelion Core\nSettlement Engine (Go)]
     API -->|Publish Event| Kafka[(Apache Kafka)]
     
-    Hermes -->|Saga Commits| Banks[(Mock Banks\nAlpha, Beta, Gamma)]
-    Hermes -->|Ledger State| DB[(PostgreSQL)]
-    Hermes -->|Cache/Lock| Redis[(Redis)]
+    Perihelion -->|Saga Commits| Banks[(Mock Banks\nHelios, Orion, Vesper)]
+    Perihelion -->|Ledger State| DB[(PostgreSQL)]
+    Perihelion -->|Cache/Lock| Redis[(Redis)]
     
-    Kafka -->|Stream| Argus[Argus Core\nFraud Engine (Go)]
-    Kafka -->|Stream| Titan[Titan Core\nAnalytics (Node.js)]
+    Kafka -->|Stream| Parallax[Parallax Core\nFraud Engine (Go)]
+    Kafka -->|Stream| Flux[Flux Core\nAnalytics (Node.js)]
     
-    Argus -->|Graph Query| DB
-    Argus -->|Graph Processing| Redis
-    Argus -->|Explain Request| Athena[Athena Core\nLLM Engine (Go)]
+    Parallax -->|Graph Query| DB
+    Parallax -->|Graph Processing| Redis
+    Parallax -->|Explain Request| Synapse[Synapse Core\nLLM Engine (Rust/Go)]
     
     Prometheus[Prometheus] -->|Scrape Metrics| API
-    Prometheus -->|Scrape Metrics| Hermes
-    Prometheus -->|Scrape Metrics| Argus
+    Prometheus -->|Scrape Metrics| Perihelion
+    Prometheus -->|Scrape Metrics| Parallax
     Grafana[Grafana] -->|Visualize| Prometheus
 ```
 
@@ -58,12 +58,12 @@ The system utilizes a polyglot monorepo approach, choosing the best tool for eac
 
 | Service | Technology | Description |
 |---------|------------|-------------|
-| **Hermes Core** | `Go` | The Settlement & Routing engine handling distributed transactions (Sagas) and ISO20022 message parsing. |
-| **Argus Core** | `Go` | The Audit & Fraud engine listening to Kafka streams, performing graph analysis and fraud scoring. |
-| **Athena Core** | `Go` | A high-performance mock inference engine simulating continuous batching. |
-| **Titan Core** | `Node.js` | Real-time analytics and reporting engine consuming transaction events. |
-| **Olympus API** | `Java (Spring Boot)` | The main API Gateway serving as the entry point for financial transactions. |
-| **The Banks** | `Java (Spring Boot)` | Mock financial institutions (`alpha-bank`, `beta-bank`, etc.) participating in the settlement network. |
+| **Perihelion Core** | `Go` | The Settlement & Routing engine handling distributed transactions (Sagas) and ISO20022 message parsing. |
+| **Parallax Core** | `Go` | The Audit & Fraud engine listening to Kafka streams, performing graph analysis and fraud scoring. |
+| **Synapse Core** | `Rust / Go` | A high-performance inference engine simulating continuous batching and semantic reasoning. |
+| **Flux Core** | `Node.js / Go` | Real-time streaming analytics and reporting engine consuming transaction events. |
+| **Nexor API** | `Java (Spring Boot)` | The main API Gateway serving as the entry point for financial transactions. |
+| **The Banks** | `Java (Spring Boot)` | Mock financial institutions (`helios-bank`, `orion-bank`, `vesper-bank`) participating in the settlement network. |
 
 ### Infrastructure Stack
 - **Message Broker:** Apache Kafka & Zookeeper
@@ -126,10 +126,10 @@ Since `make` is not natively installed on Windows, you can use the direct Docker
    Run these two commands in PowerShell to simulate the transfers:
    ```powershell
    # RTGS Transfer (>= 10,000)
-   Invoke-RestMethod -Uri "http://localhost:8080/alpha/api/transfer" -Method Post -ContentType "application/json" -Body '{"senderAccount": "ALPHA001", "receiverAccount": "BETA001", "amount": 15000.00, "currency": "INR", "description": "Demo RTGS cross-bank transfer"}'
+   Invoke-RestMethod -Uri "http://localhost:8080/helios/api/transfer" -Method Post -ContentType "application/json" -Body '{"senderAccount": "HELIOS001", "receiverAccount": "ORION001", "amount": 15000.00, "currency": "INR", "description": "Demo RTGS cross-bank transfer"}'
 
    # NEFT Transfer (< 10,000)
-   Invoke-RestMethod -Uri "http://localhost:8080/alpha/api/transfer" -Method Post -ContentType "application/json" -Body '{"senderAccount": "ALPHA002", "receiverAccount": "GAMMA001", "amount": 5000.00, "currency": "INR", "description": "Demo NEFT cross-bank transfer"}'
+   Invoke-RestMethod -Uri "http://localhost:8080/helios/api/transfer" -Method Post -ContentType "application/json" -Body '{"senderAccount": "HELIOS002", "receiverAccount": "VESPER001", "amount": 5000.00, "currency": "INR", "description": "Demo NEFT cross-bank transfer"}'
    ```
 
 3. **Tear Down:**

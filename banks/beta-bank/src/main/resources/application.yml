@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: beta-bank
+    name: orion-bank
   kafka:
     bootstrap-servers: ${KAFKA_BROKERS:localhost:29092}
     producer:
@@ -12,12 +12,12 @@ spring:
       properties:
         spring.json.add.type.headers: true
     consumer:
-      group-id: beta-bank-group
+      group-id: orion-bank-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "com.olympus.common.dto"
+        spring.json.trusted.packages: "com.nexor.common.dto"
 
-olympus:
-  bank-id: BetaBank
+nexor:
+  bank-id: OrionBank

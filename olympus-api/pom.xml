@@ -9,11 +9,11 @@
         <version>3.1.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.olympus.api</groupId>
-    <artifactId>olympus-api</artifactId>
+    <groupId>com.nexor.api</groupId>
+    <artifactId>nexor-api</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>olympus-api</name>
-    <description>Olympus API Gateway</description>
+    <name>nexor-api</name>
+    <description>Nexor API Gateway</description>
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2022.0.4</spring-cloud.version>

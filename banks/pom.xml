@@ -9,18 +9,18 @@
         <version>3.1.2</version>
         <relativePath/>
     </parent>
-    <groupId>com.olympus</groupId>
+    <groupId>com.nexor</groupId>
     <artifactId>banks-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>banks-parent</name>
-    <description>Olympus Banks Parent Project</description>
+    <description>Nexor Banks Parent Project</description>
 
     <modules>
-        <module>olympus-common</module>
-        <module>alpha-bank</module>
-        <module>beta-bank</module>
-        <module>gamma-bank</module>
+        <module>nexor-common</module>
+        <module>helios-bank</module>
+        <module>orion-bank</module>
+        <module>vesper-bank</module>
     </modules>
 
     <properties>

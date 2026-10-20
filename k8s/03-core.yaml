@@ -1,37 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: olympus-api
-  namespace: olympus
+  name: nexor-api
+  namespace: nexor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: olympus-api
+      app: nexor-api
   template:
     metadata:
       labels:
-        app: olympus-api
+        app: nexor-api
     spec:
       containers:
-      - name: olympus-api
-        image: olympus-olympus-api:latest
+      - name: nexor-api
+        image: nexor-api:latest
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
-            name: olympus-config
+            name: nexor-config
         ports:
         - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: olympus-api
-  namespace: olympus
+  name: nexor-api
+  namespace: nexor
 spec:
   type: NodePort
   selector:
-    app: olympus-api
+    app: nexor-api
   ports:
   - port: 8080
     nodePort: 30002
@@ -39,119 +39,120 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hermes-core
-  namespace: olympus
+  name: perihelion-core
+  namespace: nexor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hermes-core
+      app: perihelion-core
   template:
     metadata:
       labels:
-        app: hermes-core
+        app: perihelion-core
     spec:
       containers:
-      - name: hermes-core
-        image: olympus-hermes-core:latest
+      - name: perihelion-core
+        image: perihelion-core:latest
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
-            name: olympus-config
+            name: nexor-config
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: argus-core
-  namespace: olympus
+  name: parallax-core
+  namespace: nexor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: argus-core
+      app: parallax-core
   template:
     metadata:
       labels:
-        app: argus-core
+        app: parallax-core
     spec:
       containers:
-      - name: argus-core
-        image: olympus-argus-core:latest
+      - name: parallax-core
+        image: parallax-core:latest
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
-            name: olympus-config
+            name: nexor-config
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: athena-core
-  namespace: olympus
+  name: synapse-core
+  namespace: nexor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: athena-core
+      app: synapse-core
   template:
     metadata:
       labels:
-        app: athena-core
+        app: synapse-core
     spec:
       containers:
-      - name: athena-core
-        image: olympus-athena-core:latest
+      - name: synapse-core
+        image: synapse-core:latest
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
-            name: olympus-config
+            name: nexor-config
         ports:
         - containerPort: 8085
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: athena-core
-  namespace: olympus
+  name: synapse-core
+  namespace: nexor
 spec:
   selector:
-    app: athena-core
+    app: synapse-core
   ports:
   - port: 8085
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: titan-core
-  namespace: olympus
+  name: flux-core
+  namespace: nexor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: titan-core
+      app: flux-core
   template:
     metadata:
       labels:
-        app: titan-core
+        app: flux-core
     spec:
       containers:
-      - name: titan-core
-        image: olympus-titan-core:latest
+      - name: flux-core
+        image: flux-core:latest
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
-            name: olympus-config
+            name: nexor-config
         ports:
         - containerPort: 4000
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: titan-core
-  namespace: olympus
+  name: flux-core
+  namespace: nexor
 spec:
   type: NodePort
   selector:
-    app: titan-core
+    app: flux-core
   ports:
   - port: 4000
     nodePort: 30001
+

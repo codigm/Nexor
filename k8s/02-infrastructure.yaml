@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: olympus
+  namespace: nexor
 spec:
   replicas: 1
   selector:
@@ -20,17 +20,17 @@ spec:
         - name: POSTGRES_USER
           valueFrom:
             configMapKeyRef:
-              name: olympus-config
+              name: nexor-config
               key: DB_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
             configMapKeyRef:
-              name: olympus-config
+              name: nexor-config
               key: DB_PASSWORD
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: olympus-config
+              name: nexor-config
               key: DB_NAME
         volumeMounts:
         - name: init-sql
@@ -46,7 +46,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres
-  namespace: olympus
+  namespace: nexor
 spec:
   selector:
     app: postgres
@@ -57,7 +57,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis
-  namespace: olympus
+  namespace: nexor
 spec:
   replicas: 1
   selector:
@@ -78,7 +78,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis
-  namespace: olympus
+  namespace: nexor
 spec:
   selector:
     app: redis
@@ -89,7 +89,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: neo4j
-  namespace: olympus
+  namespace: nexor
 spec:
   replicas: 1
   selector:
@@ -106,7 +106,7 @@ spec:
         image: neo4j:5-community
         env:
         - name: NEO4J_AUTH
-          value: "neo4j/olympus_neo4j"
+          value: "neo4j/nexor_neo4j"
         ports:
         - containerPort: 7474
         - containerPort: 7687
@@ -115,7 +115,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: neo4j
-  namespace: olympus
+  namespace: nexor
 spec:
   selector:
     app: neo4j
@@ -129,7 +129,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: zookeeper
-  namespace: olympus
+  namespace: nexor
 spec:
   replicas: 1
   selector:
@@ -155,7 +155,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: zookeeper
-  namespace: olympus
+  namespace: nexor
 spec:
   selector:
     app: zookeeper
@@ -166,7 +166,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kafka
-  namespace: olympus
+  namespace: nexor
 spec:
   replicas: 1
   selector:
@@ -203,7 +203,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kafka
-  namespace: olympus
+  namespace: nexor
 spec:
   selector:
     app: kafka

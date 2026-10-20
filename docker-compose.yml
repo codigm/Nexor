@@ -12,18 +12,18 @@ services:
   # ==========================================
   postgres:
     image: postgres:15-alpine
-    container_name: olympus-postgres
+    container_name: nexor-postgres
     environment:
-      POSTGRES_USER: olympus
-      POSTGRES_PASSWORD: olympus_password
-      POSTGRES_DB: olympus_db
+      POSTGRES_USER: nexor
+      POSTGRES_PASSWORD: nexor_password
+      POSTGRES_DB: nexor_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U olympus -d olympus_db"]
+      test: ["CMD-SHELL", "pg_isready -U nexor -d nexor_db"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -31,7 +31,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: olympus-redis
+    container_name: nexor-redis
     ports:
       - "6380:6379"
     volumes:
@@ -46,9 +46,9 @@ services:
 
   neo4j:
     image: neo4j:5-community
-    container_name: olympus-neo4j
+    container_name: nexor-neo4j
     environment:
-      NEO4J_AUTH: neo4j/olympus_neo4j
+      NEO4J_AUTH: neo4j/nexor_neo4j
     ports:
       - "7474:7474"
       - "7687:7687"
@@ -63,7 +63,7 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
-    container_name: olympus-zookeeper
+    container_name: nexor-zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -79,7 +79,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.4.0
-    container_name: olympus-kafka
+    container_name: nexor-kafka
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -105,7 +105,7 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.45.0
-    container_name: olympus-prometheus
+    container_name: nexor-prometheus
     volumes:
       - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
@@ -125,7 +125,7 @@ services:
 
   grafana:
     image: grafana/grafana:10.0.3
-    container_name: olympus-grafana
+    container_name: nexor-grafana
     ports:
       - "3000:3000"
     environment:
@@ -145,7 +145,7 @@ services:
 
   jaeger:
     image: jaegertracing/all-in-one:latest
-    container_name: olympus-jaeger
+    container_name: nexor-jaeger
     ports:
       - "16686:16686"
       - "4318:4318"
@@ -156,11 +156,11 @@ services:
   # ==========================================
   # BANKS
   # ==========================================
-  alpha-bank:
+  helios-bank:
     build:
       context: ./banks
-      dockerfile: alpha-bank/Dockerfile
-    container_name: alpha-bank
+      dockerfile: helios-bank/Dockerfile
+    container_name: helios-bank
     ports:
       - "8081:8080"
     environment:
@@ -173,11 +173,11 @@ services:
         condition: service_healthy
     logging: *default-logging
 
-  beta-bank:
+  orion-bank:
     build:
       context: ./banks
-      dockerfile: beta-bank/Dockerfile
-    container_name: beta-bank
+      dockerfile: orion-bank/Dockerfile
+    container_name: orion-bank
     ports:
       - "8082:8080"
     environment:
@@ -190,11 +190,11 @@ services:
         condition: service_healthy
     logging: *default-logging
 
-  gamma-bank:
+  vesper-bank:
     build:
       context: ./banks
-      dockerfile: gamma-bank/Dockerfile
-    container_name: gamma-bank
+      dockerfile: vesper-bank/Dockerfile
+    container_name: vesper-bank
     ports:
       - "8083:8080"
     environment:
@@ -208,13 +208,13 @@ services:
     logging: *default-logging
 
   # ==========================================
-  # OLYMPUS CORE SERVICES
+  # NEXOR CORE SERVICES
   # ==========================================
-  olympus-api:
+  nexor-api:
     build:
-      context: ./olympus-api
+      context: ./nexor-api
       dockerfile: Dockerfile
-    container_name: olympus-api
+    container_name: nexor-api
     ports:
       - "8080:8080"
     environment:
@@ -226,17 +226,17 @@ services:
         condition: service_healthy
     logging: *default-logging
 
-  hermes-core:
+  perihelion-core:
     build:
-      context: ./hermes
+      context: ./perihelion
       dockerfile: Dockerfile
-    container_name: hermes-core
+    container_name: perihelion-core
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_USER=olympus
-      - DB_PASSWORD=olympus_password
-      - DB_NAME=olympus_db
+      - DB_USER=nexor
+      - DB_PASSWORD=nexor_password
+      - DB_NAME=nexor_db
       - REDIS_ADDR=redis:6379
       - KAFKA_BROKERS=kafka:9092
       - JAEGER_ENDPOINT=jaeger:4318
@@ -249,11 +249,11 @@ services:
         condition: service_healthy
     logging: *default-logging
 
-  athena-core:
+  synapse-core:
     build:
-      context: ./athena
+      context: ./synapse
       dockerfile: Dockerfile
-    container_name: athena-core
+    container_name: synapse-core
     ports:
       - "8085:8085"
     environment:
@@ -266,11 +266,11 @@ services:
         condition: service_healthy
     logging: *default-logging
 
-  titan-core:
+  flux-core:
     build:
-      context: ./titan
+      context: ./flux
       dockerfile: Dockerfile
-    container_name: titan-core
+    container_name: flux-core
     ports:
       - "4000:4000"
     environment:
@@ -283,23 +283,23 @@ services:
         condition: service_healthy
     logging: *default-logging
 
-  argus-core:
+  parallax-core:
     build:
       context: .
-      dockerfile: ./argus/Dockerfile
-    container_name: argus-core
+      dockerfile: ./parallax/Dockerfile
+    container_name: parallax-core
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_USER=olympus
-      - DB_PASSWORD=olympus_password
-      - DB_NAME=olympus_db
+      - DB_USER=nexor
+      - DB_PASSWORD=nexor_password
+      - DB_NAME=nexor_db
       - REDIS_ADDR=redis:6379
       - KAFKA_BROKERS=kafka:9092
       - JAEGER_ENDPOINT=jaeger:4318
       - NEO4J_URI=bolt://neo4j:7687
       - NEO4J_USER=neo4j
-      - NEO4J_PASSWORD=olympus_neo4j
+      - NEO4J_PASSWORD=nexor_neo4j
     depends_on:
       postgres:
         condition: service_healthy
@@ -315,13 +315,13 @@ services:
     build:
       context: ./dashboard
       dockerfile: Dockerfile
-    container_name: olympus-dashboard
+    container_name: nexor-dashboard
     ports:
       - "5173:5173"
     environment:
       - NODE_ENV=development
     depends_on:
-      - titan-core
+      - flux-core
     logging: *default-logging
 
 volumes:

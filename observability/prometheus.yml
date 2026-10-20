@@ -6,6 +6,6 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
   
-  - job_name: 'hermes'
+  - job_name: 'perihelion'
     static_configs:
-      - targets: ['hermes-core:9091']
+      - targets: ['perihelion-core:9091']

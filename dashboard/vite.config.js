@@ -9,7 +9,7 @@ export default defineConfig({
     host: '0.0.0.0',
     proxy: {
       '/api': {
-        target: 'http://olympus-api.olympus.svc.cluster.local:8080',
+        target: 'http://nexor-api.nexor.svc.cluster.local:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       }

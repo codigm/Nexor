@@ -88,8 +88,8 @@ export default function App() {
   const [stats, setStats] = useState({ totalVolume: 0, txCount: 0, rtgsCount: 0, neftCount: 0 });
   const [chartData, setChartData] = useState([]);
   const [formData, setFormData] = useState({
-    senderAccount: 'ALPHA001',
-    receiverAccount: 'BETA001',
+    senderAccount: 'HELIOS001',
+    receiverAccount: 'ORION001',
     amount: '15000',
     description: 'Dashboard Transfer'
   });
@@ -127,7 +127,7 @@ export default function App() {
     setIsSubmitting(true);
     setLastTxStatus(null);
     try {
-      // Call alpha-bank directly — it publishes to Kafka → entire pipeline processes it
+      // Call helios-bank directly — it publishes to Kafka → entire pipeline processes it
       const res = await fetch('http://localhost:30003/api/transfer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -158,7 +158,7 @@ export default function App() {
         <div className="header-left">
           <h1 className="dashboard-title">
             <IconActivity />
-            <span className="title-olympus">OLYMPUS</span>
+            <span className="title-nexor">NEXOR</span>
             <span className="title-sub">Network</span>
           </h1>
           <div className="header-subtitle">Central Bank Real-Time Gross Settlement Platform</div>

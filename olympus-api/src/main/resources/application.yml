@@ -3,28 +3,28 @@ server:
 
 spring:
   application:
-    name: olympus-api
+    name: nexor-api
   cloud:
     gateway:
       routes:
-        - id: alpha-bank
-          uri: http://alpha-bank:8080
+        - id: helios-bank
+          uri: http://helios-bank:8080
           predicates:
-            - Path=/alpha/**
+            - Path=/helios/**
           filters:
-            - RewritePath=/alpha/(?<segment>.*), /$\{segment}
-        - id: beta-bank
-          uri: http://beta-bank:8080
+            - RewritePath=/helios/(?<segment>.*), /$\{segment}
+        - id: orion-bank
+          uri: http://orion-bank:8080
           predicates:
-            - Path=/beta/**
+            - Path=/orion/**
           filters:
-            - RewritePath=/beta/(?<segment>.*), /$\{segment}
-        - id: gamma-bank
-          uri: http://gamma-bank:8080
+            - RewritePath=/orion/(?<segment>.*), /$\{segment}
+        - id: vesper-bank
+          uri: http://vesper-bank:8080
           predicates:
-            - Path=/gamma/**
+            - Path=/vesper/**
           filters:
-            - RewritePath=/gamma/(?<segment>.*), /$\{segment}
+            - RewritePath=/vesper/(?<segment>.*), /$\{segment}
 
 management:
   endpoints:

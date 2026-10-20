@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.olympus</groupId>
+        <groupId>com.nexor</groupId>
         <artifactId>banks-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>beta-bank</artifactId>
-    <name>beta-bank</name>
-    <description>Beta Bank Service</description>
+    <artifactId>orion-bank</artifactId>
+    <name>orion-bank</name>
+    <description>Orion Bank Service</description>
 
     <dependencies>
         <dependency>
@@ -23,8 +23,8 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.olympus</groupId>
-            <artifactId>olympus-common</artifactId>
+            <groupId>com.nexor</groupId>
+            <artifactId>nexor-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

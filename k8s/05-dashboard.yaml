@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dashboard
-  namespace: olympus
+  namespace: nexor
 spec:
   replicas: 1
   selector:
@@ -15,11 +15,11 @@ spec:
     spec:
       containers:
       - name: dashboard
-        image: olympus-dashboard:latest
+        image: nexor-dashboard:latest
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
-            name: olympus-config
+            name: nexor-config
         ports:
         - containerPort: 5173
 ---
@@ -27,7 +27,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dashboard
-  namespace: olympus
+  namespace: nexor
 spec:
   type: NodePort
   selector:
